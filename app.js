@@ -22,7 +22,6 @@ const TAB_COPY = {
 
 const appState = loadState();
 let currentIssueId = null;
-let editingIssueId = null;
 
 init();
 
@@ -30,7 +29,6 @@ function init() {
   bindTabs();
   bindPeopleForm();
   bindProjectForm();
-  renderIssueForm();
   renderAll();
   bindIssueActions();
   updateTopbar("dashboard");
@@ -236,11 +234,6 @@ function renderAll() {
     resolutionSummary: "-",
   });
 
-  if (editingIssueId) {
-    renderIssueForm(appState.issues.find(issue => issue.id === editingIssueId));
-  } else {
-    renderIssueForm();
-  }
 }
 
 function updateTopbar(tabId) {
@@ -305,7 +298,6 @@ function renderBoard() {
               <small>Assigned: ${escapeHtml(assignee)}</small>
               <div class="table-actions" style="margin-top: .5rem;">
                 <button onclick="viewIssue(${issue.id})">View</button>
-                <button onclick="startEditIssue(${issue.id})">Edit</button>
               </div>
             </article>
           `;
@@ -342,7 +334,6 @@ function renderIssueTable() {
         <td>
           <div class="table-actions">
             <button onclick="viewIssue(${issue.id})">View</button>
-            <button onclick="startEditIssue(${issue.id})">Edit</button>
           </div>
         </td>
       </tr>
@@ -407,9 +398,6 @@ function renderIssueDetail(issue) {
     <dt>Actual resolution date</dt><dd>${escapeHtml(issue.actualResolutionDate || "-")}</dd>
     <dt>Resolution summary</dt><dd>${escapeHtml(issue.resolutionSummary || "-")}</dd>
   `;
-
-  const editBtn = document.getElementById("detailEditBtn");
-  editBtn.onclick = () => startEditIssue(issue.id);
 }
 
 function renderPeople() {
@@ -498,10 +486,6 @@ function priorityRank(priority) {
   return 2;
 }
 
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -512,4 +496,3 @@ function escapeHtml(value) {
 }
 
 window.viewIssue = viewIssue;
-window.startEditIssue = startEditIssue;
