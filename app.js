@@ -30,6 +30,7 @@ function init() {
   bindPeopleForm();
   bindProjectForm();
   renderAll();
+  bindIssueActions();
   updateTopbar("dashboard");
 }
 
@@ -119,6 +120,93 @@ function bindProjectForm() {
     saveState();
     renderAll();
   });
+}
+
+function bindIssueActions() {
+  document.getElementById("createIssueBtn").addEventListener("click", () => {
+    editingIssueId = null;
+    currentIssueId = null;
+    renderIssueForm();
+    document.getElementById("issueDetail").innerHTML = `<dt>Issue</dt><dd>Select an issue from the table/board to view details.</dd>`;
+    switchTab("issues");
+  });
+}
+
+function renderIssueForm(issue = null) {
+  const issueForm = document.getElementById("issueForm");
+  const identifiedByOptions = appState.people
+    .map(p => `<option value="${p.id}" ${issue?.identifiedById === p.id ? "selected" : ""}>${fullName(p)}</option>`)
+    .join("");
+
+  const assigneeOptions = [`<option value="">Unassigned</option>`]
+    .concat(appState.people.map(p => `<option value="${p.id}" ${issue?.assigneeId === p.id ? "selected" : ""}>${fullName(p)}</option>`))
+    .join("");
+
+  const projectOptions = appState.projects
+    .map(project => `<option value="${project.id}" ${issue?.projectId === project.id ? "selected" : ""}>${project.name}</option>`)
+    .join("");
+
+  const statusOptions = STATUSES
+    .map(status => `<option value="${status}" ${issue ? (issue.status === status ? "selected" : "") : (status === "open" ? "selected" : "")}>${capitalize(status)}</option>`)
+    .join("");
+
+  const priorityOptions = PRIORITIES
+    .map(priority => `<option value="${priority}" ${issue ? (issue.priority === priority ? "selected" : "") : (priority === "medium" ? "selected" : "")}>${capitalize(priority)}</option>`)
+    .join("");
+
+  document.getElementById("issueFormTitle").textContent = issue ? `Edit Issue #${issue.id}` : "Create Issue";
+
+  issueForm.innerHTML = `
+    <label>Summary <input name="summary" required value="${escapeHtml(issue?.summary || "")}" /></label>
+    <label>Detailed Description <textarea name="description" required>${escapeHtml(issue?.description || "")}</textarea></label>
+    <label>Identified By <select name="identifiedById" required>${identifiedByOptions}</select></label>
+    <label>Identified Date <input type="date" name="identifiedDate" required value="${issue?.identifiedDate || today()}" /></label>
+    <label>Project <select name="projectId" required>${projectOptions}</select></label>
+    <label>Assigned To <select name="assigneeId">${assigneeOptions}</select></label>
+    <label>Status <select name="status" required>${statusOptions}</select></label>
+    <label>Priority <select name="priority" required>${priorityOptions}</select></label>
+    <label>Target Resolution Date <input type="date" name="targetResolutionDate" value="${issue?.targetResolutionDate || ""}" /></label>
+    <label>Actual Resolution Date <input type="date" name="actualResolutionDate" value="${issue?.actualResolutionDate || ""}" /></label>
+    <label>Resolution Summary <textarea name="resolutionSummary">${escapeHtml(issue?.resolutionSummary || "")}</textarea></label>
+    <button type="submit">Save Issue</button>
+  `;
+
+  issueForm.onsubmit = event => {
+    event.preventDefault();
+    const payload = Object.fromEntries(new FormData(issueForm).entries());
+
+    const issueData = {
+      summary: payload.summary.trim(),
+      description: payload.description.trim(),
+      identifiedById: Number(payload.identifiedById),
+      identifiedDate: payload.identifiedDate,
+      projectId: Number(payload.projectId),
+      assigneeId: payload.assigneeId ? Number(payload.assigneeId) : null,
+      status: payload.status,
+      priority: payload.priority,
+      targetResolutionDate: payload.targetResolutionDate || "",
+      actualResolutionDate: payload.actualResolutionDate || "",
+      resolutionSummary: payload.resolutionSummary.trim(),
+    };
+
+    if (!issueData.summary) {
+      alert("Summary is required.");
+      return;
+    }
+
+    if (editingIssueId) {
+      const index = appState.issues.findIndex(it => it.id === editingIssueId);
+      appState.issues[index] = { ...appState.issues[index], ...issueData };
+      editingIssueId = null;
+    } else {
+      appState.issues.push({ id: appState.nextIds.issue++, ...issueData });
+    }
+
+    issueForm.reset();
+    saveState();
+    renderAll();
+    switchTab("issues");
+  };
 }
 
 function renderAll() {
@@ -356,6 +444,14 @@ function viewIssue(id) {
   if (!issue) return;
   currentIssueId = id;
   renderIssueDetail(issue);
+  switchTab("issues");
+}
+
+function startEditIssue(id) {
+  const issue = appState.issues.find(it => it.id === id);
+  if (!issue) return;
+  editingIssueId = id;
+  renderIssueForm(issue);
   switchTab("issues");
 }
 

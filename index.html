@@ -39,7 +39,10 @@
     </section>
 
     <section id="issues" class="tab panel">
-      <h2>Issues</h2>
+      <div class="row-between">
+        <h2>Issues</h2>
+        <button id="createIssueBtn" type="button">Create New Issue</button>
+      </div>
       <div id="issueAnalytics" class="dashboard-grid"></div>
       <div class="table-wrap">
         <table>
@@ -51,9 +54,18 @@
           <tbody id="issuesTableBody"></tbody>
         </table>
       </div>
-      <div style="margin-top:1rem;">
-        <h3>Issue Detail</h3>
-        <dl id="issueDetail" class="details"></dl>
+      <div class="split" style="margin-top:1rem;">
+        <div>
+          <h3 id="issueFormTitle">Create Issue</h3>
+          <form id="issueForm" class="form-grid"></form>
+        </div>
+        <div>
+          <div class="row-between">
+            <h3>Issue Detail</h3>
+            <button id="detailEditBtn" type="button">Edit Issue</button>
+          </div>
+          <dl id="issueDetail" class="details"></dl>
+        </div>
       </div>
     </section>
 
