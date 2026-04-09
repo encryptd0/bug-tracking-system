@@ -1,20 +1,22 @@
-# Kanban Bug Tracker
+# Kanban Bug Tracker (HTML/CSS/JavaScript)
 
-A modern-themed bug tracking app with a Kanban board homepage.
+A modern bug tracker implemented with **only HTML, CSS, and JavaScript**.
 
-## Features
-- Create, view, edit, and assign issues.
-- View all issues and detailed issue pages.
-- Create people and projects.
-- Project summary report (issues by project).
-- SQLite persistence across sessions.
+## What it supports
+- Create issues
+- Assign issues (or leave unassigned and assign later)
+- View all issues
+- View a particular issue
+- Edit issues
+- Create people
+- Create projects
+- View all issues by project
+- Kanban-style board on the index screen
+
+## Data persistence
+Data is persisted in `localStorage`, so your projects, people, and bugs remain across browser sessions on the same machine/browser profile.
 
 ## Run
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python app.py
-```
+Just open `index.html` in a browser.
 
-Open `http://127.0.0.1:5000`.
+No backend and no package install required.
