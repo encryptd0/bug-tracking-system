@@ -31,7 +31,7 @@ function init() {
   bindProjectForm();
   renderAll();
   bindIssueActions();
-  updateTopbar("dashboard");
+  switchTab("dashboard");
 }
 
 function loadState() {
@@ -77,7 +77,11 @@ function bindTabs() {
 
 function switchTab(tabId) {
   document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabId));
-  document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.id === tabId));
+  document.querySelectorAll(".tab").forEach(tab => {
+    const isActive = tab.id === tabId;
+    tab.classList.toggle("active", isActive);
+    tab.hidden = !isActive;
+  });
   updateTopbar(tabId);
 }
 
