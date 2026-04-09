@@ -37,6 +37,18 @@ nav { display: flex; gap: .5rem; flex-wrap: wrap; }
 }
 .tab-btn.active { background: #1e3a8a; border-color: #3b82f6; }
 
+
+.tab-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: #0b1220;
+  color: var(--text);
+  border: 1px solid #334155;
+  border-radius: .55rem;
+  padding: .45rem .7rem;
+}
+.tab-link:hover { border-color: #3b82f6; }
 main { padding: 1.25rem 1.75rem 2rem; }
 .panel {
   display: none;
