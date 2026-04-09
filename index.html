@@ -9,51 +9,64 @@
 <body>
   <header class="topbar">
     <div class="topbar-copy">
-      <h1 id="topbarTitle">Board Dashboard</h1>
-      <p id="topbarDescription">Team-wide bug health, assignee workload, and issue flow.</p>
+      <h1 id="topbarTitle">Dashboard</h1>
+      <p id="topbarDescription">All bug details including reporter, assignee, priority, and status.</p>
     </div>
     <nav>
-      <button class="tab-btn active" data-tab="board">Board</button>
-      <button class="tab-btn" data-tab="issues">All Issues</button>
-      <button class="tab-btn" data-tab="create-issue">Create Issue</button>
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="project">Project</button>
       <button class="tab-btn" data-tab="people">People</button>
-      <button class="tab-btn" data-tab="projects">Projects</button>
-      <button class="tab-btn" data-tab="report">By Project</button>
+      <button class="tab-btn" data-tab="issues">Issues</button>
     </nav>
   </header>
 
   <main>
-    <section id="board" class="tab panel active">
+    <section id="dashboard" class="tab panel active">
       <div id="boardSummary" class="dashboard-grid"></div>
       <h2>Issue Board</h2>
       <div class="board" id="boardColumns"></div>
-    </section>
-
-    <section id="issues" class="tab panel">
-      <h2>All Issues</h2>
+      <h2>Issue Ownership Overview</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>Summary</th><th>Project</th><th>Assignee</th><th>Status</th><th>Priority</th><th>Identified</th><th>Actions</th>
+              <th>ID</th><th>Summary</th><th>Reported By</th><th>Assigned To</th><th>Project</th><th>Status</th><th>Priority</th>
+            </tr>
+          </thead>
+          <tbody id="dashboardIssueBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="issues" class="tab panel">
+      <div class="row-between">
+        <h2>Issues</h2>
+        <button id="createIssueBtn" type="button">Create New Issue</button>
+      </div>
+      <div id="issueAnalytics" class="dashboard-grid"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Summary</th><th>Reported By</th><th>Project</th><th>Assignee</th><th>Status</th><th>Priority</th><th>Identified</th><th>Actions</th>
             </tr>
           </thead>
           <tbody id="issuesTableBody"></tbody>
         </table>
       </div>
-    </section>
-
-    <section id="create-issue" class="tab panel">
-      <h2 id="issueFormTitle">Create Issue</h2>
-      <form id="issueForm" class="form-grid"></form>
-    </section>
-
-    <section id="issue-detail" class="tab panel">
-      <div class="row-between">
-        <h2>Issue Detail</h2>
-        <button id="detailEditBtn">Edit Issue</button>
+      <div class="split" style="margin-top:1rem;">
+        <div>
+          <h3 id="issueFormTitle">Create Issue</h3>
+          <form id="issueForm" class="form-grid"></form>
+        </div>
+        <div>
+          <div class="row-between">
+            <h3>Issue Detail</h3>
+            <button id="detailEditBtn" type="button">Edit Issue</button>
+          </div>
+          <dl id="issueDetail" class="details"></dl>
+        </div>
       </div>
-      <dl id="issueDetail" class="details"></dl>
     </section>
 
     <section id="people" class="tab panel split">
@@ -64,6 +77,9 @@
           <label>Surname <input name="surname" required /></label>
           <label>Email <input type="email" name="email" required /></label>
           <label>Username <input name="username" required /></label>
+          <label>Project
+            <select name="projectId" id="personProjectSelect" required></select>
+          </label>
           <label>Profile Picture URL <input name="profilePictureUrl" /></label>
           <button type="submit">Add Person</button>
         </form>
@@ -74,7 +90,7 @@
       </div>
     </section>
 
-    <section id="projects" class="tab panel split">
+    <section id="project" class="tab panel split">
       <div>
         <h2>Create Project</h2>
         <form id="projectForm" class="form-grid">
@@ -83,18 +99,15 @@
         </form>
       </div>
       <div>
-        <h2>Projects</h2>
+        <h2>Projects & Status</h2>
         <ul id="projectList" class="list plain"></ul>
-      </div>
-    </section>
-
-    <section id="report" class="tab panel">
-      <h2>All Issues by Project</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Project</th><th>Issue Count</th></tr></thead>
-          <tbody id="projectReportBody"></tbody>
-        </table>
+        <h3>All Issues by Project</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Project</th><th>Issue Count</th><th>Open</th><th>Resolved</th><th>Overdue</th></tr></thead>
+            <tbody id="projectReportBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
   </main>
