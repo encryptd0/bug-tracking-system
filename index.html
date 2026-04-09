@@ -3,37 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bug Tracker</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Bug Tracking</title>
+  <link rel="stylesheet" href="styles.exact.css" />
 </head>
 <body>
-  <div class="aurora"></div>
   <div class="app-shell">
+    <div class="window-strip" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+
     <header class="hero">
+      <div class="hero-spacer" aria-hidden="true"></div>
       <h1>Bug Tracking</h1>
       <div class="hero-actions">
-        <p class="kbd-hint">Press <kbd>/</kbd> to search</p>
         <div class="avatar-stack" id="headerAvatars"></div>
-        <button type="button" id="clearDataBtn" class="ghost danger-outline">Reset Demo Data</button>
       </div>
     </header>
 
     <main>
       <section class="board" aria-label="Issue board">
         <article class="board-column">
-          <div class="column-head"><h2>Backlog:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-head"><h2>Backlog:</h2></div>
+          <button type="button" class="mini-plus">+</button>
           <div class="column-list" id="backlogColumn"></div>
         </article>
+
         <article class="board-column">
-          <div class="column-head"><h2>Ready:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-head"><h2>Ready:</h2></div>
+          <button type="button" class="mini-plus">+</button>
           <div class="column-list" id="readyColumn"></div>
         </article>
+
         <article class="board-column">
-          <div class="column-head"><h2>In progress:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-head"><h2>In progress:</h2></div>
+          <button type="button" class="mini-plus">+</button>
           <div class="column-list" id="inProgressColumn"></div>
         </article>
+
         <article class="board-column">
-          <div class="column-head"><h2>Done:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-head"><h2>Done:</h2></div>
+          <button type="button" class="mini-plus">+</button>
           <div class="column-list" id="doneColumn"></div>
         </article>
       </section>
@@ -49,7 +58,7 @@
       </section>
 
       <section class="panel two-col">
-        <article class="card glass">
+        <article class="card">
           <h2>Create Person</h2>
           <form id="personForm" class="grid-form compact-form">
             <label>ID <input type="text" id="personId" required /></label>
@@ -63,7 +72,7 @@
           <ul id="peopleList" class="chip-list"></ul>
         </article>
 
-        <article class="card glass">
+        <article class="card">
           <h2>Create Project</h2>
           <form id="projectForm" class="grid-form compact-form">
             <label>ID <input type="text" id="projectId" required /></label>
@@ -75,7 +84,7 @@
       </section>
 
       <section class="panel two-col">
-        <article class="card glass">
+        <article class="card">
           <h2 id="issueFormTitle">Create Issue</h2>
           <form id="issueForm" class="grid-form">
             <input type="hidden" id="issueId" />
@@ -109,13 +118,13 @@
           </form>
         </article>
 
-        <article class="card sticky glass">
+        <article class="card">
           <h2>Issue Details</h2>
           <div id="issueDetails" class="details-empty">Select an issue to view full details.</div>
         </article>
       </section>
 
-      <section class="card glass">
+      <section class="card">
         <div class="toolbar toolbar-filters">
           <h2>All Issues</h2>
           <div class="toolbar-controls">
