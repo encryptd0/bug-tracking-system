@@ -1,6 +1,36 @@
 const STORAGE_KEY = "kanban_bug_tracker_data_v1";
 const STATUSES = ["open", "resolved", "overdue"];
 const PRIORITIES = ["low", "medium", "high"];
+const TAB_COPY = {
+  board: {
+    title: "Board Dashboard",
+    description: "Team-wide bug health, assignee workload, and issue flow.",
+  },
+  issues: {
+    title: "All Issues",
+    description: "Complete issue register with status, ownership, and priority.",
+  },
+  "create-issue": {
+    title: "Create Issue",
+    description: "Capture a new bug with all required project and resolution details.",
+  },
+  "issue-detail": {
+    title: "Issue Detail",
+    description: "Review a single issue record, timeline, and resolution information.",
+  },
+  people: {
+    title: "People",
+    description: "Manage users and view the current people directory.",
+  },
+  projects: {
+    title: "Projects",
+    description: "Create and manage projects used to organize issues.",
+  },
+  report: {
+    title: "Issues by Project",
+    description: "Project-level issue counts for quick portfolio reporting.",
+  },
+};
 
 const appState = loadState();
 let currentIssueId = null;
@@ -14,6 +44,7 @@ function init() {
   bindProjectForm();
   renderIssueForm();
   renderAll();
+  updateTopbar("board");
 }
 
 function loadState() {
@@ -52,6 +83,7 @@ function bindTabs() {
 function switchTab(tabId) {
   document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabId));
   document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.id === tabId));
+  updateTopbar(tabId);
 }
 
 function bindPeopleForm() {
@@ -172,6 +204,7 @@ function renderIssueForm(issue = null) {
 }
 
 function renderAll() {
+  renderBoardSummary();
   renderBoard();
   renderIssueTable();
   renderPeople();
@@ -183,6 +216,46 @@ function renderAll() {
   } else {
     renderIssueForm();
   }
+}
+
+function updateTopbar(tabId) {
+  const copy = TAB_COPY[tabId] || { title: "Kanban Bug Tracker", description: "" };
+  document.getElementById("topbarTitle").textContent = copy.title;
+  document.getElementById("topbarDescription").textContent = copy.description;
+}
+
+function renderBoardSummary() {
+  const summary = document.getElementById("boardSummary");
+  const totalIssues = appState.issues.length;
+  const unassignedCount = appState.issues.filter(issue => !issue.assigneeId).length;
+  const peopleWithIssues = appState.people
+    .map(person => ({
+      person,
+      assignedCount: appState.issues.filter(issue => issue.assigneeId === person.id).length,
+      openCount: appState.issues.filter(issue => issue.assigneeId === person.id && issue.status === "open").length,
+    }))
+    .sort((a, b) => b.assignedCount - a.assignedCount || a.person.name.localeCompare(b.person.name));
+
+  summary.innerHTML = `
+    <article class="dashboard-card">
+      <h3>Issue Totals</h3>
+      <p><strong>${totalIssues}</strong> total issue(s)</p>
+      <p>${appState.issues.filter(issue => issue.status === "open").length} open · ${appState.issues.filter(issue => issue.status === "resolved").length} resolved · ${appState.issues.filter(issue => issue.status === "overdue").length} overdue</p>
+      <p>${unassignedCount} unassigned issue(s)</p>
+    </article>
+    <article class="dashboard-card">
+      <h3>Priority Mix</h3>
+      <p>High: <strong>${appState.issues.filter(issue => issue.priority === "high").length}</strong></p>
+      <p>Medium: <strong>${appState.issues.filter(issue => issue.priority === "medium").length}</strong></p>
+      <p>Low: <strong>${appState.issues.filter(issue => issue.priority === "low").length}</strong></p>
+    </article>
+    <article class="dashboard-card">
+      <h3>People Workload</h3>
+      <ul class="dashboard-list">
+        ${peopleWithIssues.map(row => `<li>${escapeHtml(fullName(row.person))}: ${row.assignedCount} assigned (${row.openCount} open)</li>`).join("") || "<li>No people found.</li>"}
+      </ul>
+    </article>
+  `;
 }
 
 function renderBoard() {

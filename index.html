@@ -8,9 +8,9 @@
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <h1>Kanban Bug Tracker</h1>
-      <p>Modern issue tracking built with HTML, CSS, and JavaScript.</p>
+    <div class="topbar-copy">
+      <h1 id="topbarTitle">Board Dashboard</h1>
+      <p id="topbarDescription">Team-wide bug health, assignee workload, and issue flow.</p>
     </div>
     <nav>
       <button class="tab-btn active" data-tab="board">Board</button>
@@ -24,6 +24,8 @@
 
   <main>
     <section id="board" class="tab panel active">
+      <div id="boardSummary" class="dashboard-grid"></div>
+      <h2>Issue Board</h2>
       <div class="board" id="boardColumns"></div>
     </section>
 
