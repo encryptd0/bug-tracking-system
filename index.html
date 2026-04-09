@@ -9,39 +9,36 @@
 <body>
   <div class="aurora"></div>
   <div class="app-shell">
-    <header class="hero glass">
-      <div>
-        <p class="eyebrow">Issue Management Workspace</p>
-        <h1>Bug Tracker</h1>
-        <p class="hero-subtitle">Track projects, teams, and issues with a calmer, focused workflow inspired by Apple-style product design.</p>
-      </div>
+    <header class="hero">
+      <h1>Bug Tracking</h1>
       <div class="hero-actions">
         <p class="kbd-hint">Press <kbd>/</kbd> to search</p>
+        <div class="avatar-stack" id="headerAvatars"></div>
         <button type="button" id="clearDataBtn" class="ghost danger-outline">Reset Demo Data</button>
       </div>
     </header>
 
     <main>
-      <section class="stats-grid" id="statsGrid">
-        <article class="stat-card glass">
-          <p>Total Issues</p>
-          <h3 id="statTotal">0</h3>
+      <section class="board" aria-label="Issue board">
+        <article class="board-column">
+          <div class="column-head"><h2>Backlog:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-list" id="backlogColumn"></div>
         </article>
-        <article class="stat-card glass">
-          <p>Open</p>
-          <h3 id="statOpen">0</h3>
+        <article class="board-column">
+          <div class="column-head"><h2>Ready:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-list" id="readyColumn"></div>
         </article>
-        <article class="stat-card glass">
-          <p>Overdue</p>
-          <h3 id="statOverdue">0</h3>
+        <article class="board-column">
+          <div class="column-head"><h2>In progress:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-list" id="inProgressColumn"></div>
         </article>
-        <article class="stat-card glass">
-          <p>Resolved</p>
-          <h3 id="statResolved">0</h3>
+        <article class="board-column">
+          <div class="column-head"><h2>Done:</h2><button type="button" class="mini-plus">+</button></div>
+          <div class="column-list" id="doneColumn"></div>
         </article>
       </section>
 
-      <section class="quick-filters glass" aria-label="Quick filters">
+      <section class="quick-filters" aria-label="Quick filters">
         <p class="quick-title">Focus</p>
         <div class="quick-filter-buttons">
           <button type="button" class="chip-btn is-active" data-filter="all">All Issues</button>

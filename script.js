@@ -23,7 +23,92 @@ const defaultData = {
     { id: "proj1", name: "Website Revamp" },
     { id: "proj2", name: "Mobile App" }
   ],
-  issues: []
+  issues: [
+    {
+      id: "BUG-101",
+      summary: "Undo function doesn't always work",
+      description: "Undo fails after deleting two consecutive comments.",
+      identifiedBy: "p1",
+      identifiedDate: "2026-03-28",
+      projectId: "proj1",
+      assignedTo: "",
+      status: "open",
+      priority: "low",
+      targetDate: "2026-04-25",
+      actualDate: "",
+      resolutionSummary: ""
+    },
+    {
+      id: "BUG-102",
+      summary: "Search is displaying incorrect results",
+      description: "Global search returns stale records after project change.",
+      identifiedBy: "p2",
+      identifiedDate: "2026-03-29",
+      projectId: "proj1",
+      assignedTo: "p1",
+      status: "open",
+      priority: "medium",
+      targetDate: "2026-04-18",
+      actualDate: "",
+      resolutionSummary: ""
+    },
+    {
+      id: "BUG-103",
+      summary: "Image previews not generating",
+      description: "Uploaded files stay in processing for several minutes.",
+      identifiedBy: "p1",
+      identifiedDate: "2026-03-31",
+      projectId: "proj2",
+      assignedTo: "p2",
+      status: "overdue",
+      priority: "medium",
+      targetDate: "2026-04-02",
+      actualDate: "",
+      resolutionSummary: ""
+    },
+    {
+      id: "BUG-104",
+      summary: "2 factor authentication not working",
+      description: "Enterprise users cannot complete 2FA challenge.",
+      identifiedBy: "p2",
+      identifiedDate: "2026-03-25",
+      projectId: "proj2",
+      assignedTo: "p1",
+      status: "overdue",
+      priority: "high",
+      targetDate: "2026-04-01",
+      actualDate: "",
+      resolutionSummary: ""
+    },
+    {
+      id: "BUG-105",
+      summary: "Export to CSV is abnormally slow",
+      description: "Export takes over 30 seconds on medium-sized datasets.",
+      identifiedBy: "p2",
+      identifiedDate: "2026-03-24",
+      projectId: "proj1",
+      assignedTo: "p2",
+      status: "resolved",
+      priority: "medium",
+      targetDate: "2026-04-08",
+      actualDate: "2026-04-07",
+      resolutionSummary: "Added index to export query path."
+    },
+    {
+      id: "BUG-106",
+      summary: "Login button doesn't work on mobile",
+      description: "Tap target does not trigger submit on iOS Safari.",
+      identifiedBy: "p1",
+      identifiedDate: "2026-03-23",
+      projectId: "proj2",
+      assignedTo: "p2",
+      status: "open",
+      priority: "medium",
+      targetDate: "2026-04-15",
+      actualDate: "",
+      resolutionSummary: ""
+    }
+  ]
 };
 
 const priorityRank = {
@@ -51,6 +136,11 @@ const issueFormTitle = document.getElementById("issueFormTitle");
 const saveIssueBtn = document.getElementById("saveIssueBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 const clearDataBtn = document.getElementById("clearDataBtn");
+const headerAvatars = document.getElementById("headerAvatars");
+const backlogColumn = document.getElementById("backlogColumn");
+const readyColumn = document.getElementById("readyColumn");
+const inProgressColumn = document.getElementById("inProgressColumn");
+const doneColumn = document.getElementById("doneColumn");
 const quickFilterButtons = Array.from(document.querySelectorAll(".chip-btn"));
 
 personForm.addEventListener("submit", onCreatePerson);
@@ -74,6 +164,7 @@ function bootstrap() {
   renderProjects();
   renderIssues();
   renderStats();
+  renderHeaderAvatars();
 }
 
 function loadData() {
@@ -141,6 +232,7 @@ function renderPeople() {
   peopleList.innerHTML = data.people
     .map((p) => `<li>${p.name} ${p.surname} (@${p.username}) • ${p.email}</li>`)
     .join("");
+  renderHeaderAvatars();
 }
 
 function renderProjects() {
@@ -263,6 +355,82 @@ function syncQuickFiltersFromManualFilters() {
   quickFilterButtons.forEach((button) => button.classList.remove("is-active"));
 }
 
+function initials(person) {
+  if (!person) return "?";
+  return `${person.name?.[0] || ""}${person.surname?.[0] || ""}`.toUpperCase();
+}
+
+function avatarColor(seed) {
+  const palette = ["#0ea5e9", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#14b8a6"];
+  let hash = 0;
+  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) % 997;
+  return palette[hash % palette.length];
+}
+
+function renderHeaderAvatars() {
+  if (!headerAvatars) return;
+  headerAvatars.innerHTML = data.people
+    .slice(0, 4)
+    .map((person) => `<span class="avatar" style="background:${avatarColor(person.id)}" title="${person.name} ${person.surname}">${initials(person)}</span>`)
+    .join("");
+}
+
+function pickPlatformBadge(issue) {
+  const text = `${issue.summary} ${issue.description}`.toLowerCase();
+  if (text.includes("chrome")) return "chrome";
+  if (text.includes("ios") || text.includes("mobile") || text.includes("safari")) return "ie";
+  return "all";
+}
+
+function renderBoard() {
+  if (!backlogColumn) return;
+  const columns = {
+    backlog: [],
+    ready: [],
+    progress: [],
+    done: []
+  };
+
+  data.issues.forEach((issue) => {
+    const derived = deriveStatus(issue);
+    if (derived === "resolved") {
+      columns.done.push(issue);
+    } else if (derived === "overdue") {
+      columns.progress.push(issue);
+    } else if (issue.assignedTo) {
+      columns.ready.push(issue);
+    } else {
+      columns.backlog.push(issue);
+    }
+  });
+
+  const renderCards = (list) => {
+    if (!list.length) return '<div class="issue-card"><h3>No issues</h3></div>';
+    return list
+      .slice(0, 6)
+      .map((issue) => {
+        const identified = data.people.find((p) => p.id === issue.identifiedBy);
+        return `<article class="issue-card" onclick="viewIssue('${issue.id}')">
+          <h3>${issue.summary}</h3>
+          <div class="issue-meta">
+            <div class="pills">
+              <span class="pill ${issue.priority}">${issue.priority}</span>
+              <span class="pill ${pickPlatformBadge(issue)}">${pickPlatformBadge(issue)}</span>
+            </div>
+            <span class="card-count">${issue.id.replace("BUG-", "")}</span>
+          </div>
+          <div class="avatar" style="margin-top:0.45rem;background:${avatarColor(issue.identifiedBy)}">${initials(identified)}</div>
+        </article>`;
+      })
+      .join("");
+  };
+
+  backlogColumn.innerHTML = renderCards(columns.backlog);
+  readyColumn.innerHTML = renderCards(columns.ready);
+  inProgressColumn.innerHTML = renderCards(columns.progress);
+  doneColumn.innerHTML = renderCards(columns.done);
+}
+
 function renderIssues() {
   issueTableBody.innerHTML = "";
 
@@ -271,6 +439,7 @@ function renderIssues() {
   if (filtered.length === 0) {
     issueTableBody.innerHTML = `<tr><td colspan="8">No issues found for the current filters.</td></tr>`;
     renderStats();
+    renderBoard();
     return;
   }
 
@@ -298,6 +467,7 @@ function renderIssues() {
   });
 
   renderStats();
+  renderBoard();
   syncQuickFiltersFromManualFilters();
 }
 
@@ -314,10 +484,15 @@ function renderStats() {
     { total: 0, open: 0, overdue: 0, resolved: 0 }
   );
 
-  document.getElementById("statTotal").textContent = totals.total;
-  document.getElementById("statOpen").textContent = totals.open;
-  document.getElementById("statOverdue").textContent = totals.overdue;
-  document.getElementById("statResolved").textContent = totals.resolved;
+  const statTotal = document.getElementById("statTotal");
+  const statOpen = document.getElementById("statOpen");
+  const statOverdue = document.getElementById("statOverdue");
+  const statResolved = document.getElementById("statResolved");
+
+  if (statTotal) statTotal.textContent = totals.total;
+  if (statOpen) statOpen.textContent = totals.open;
+  if (statOverdue) statOverdue.textContent = totals.overdue;
+  if (statResolved) statResolved.textContent = totals.resolved;
 }
 
 function viewIssue(issueId) {
