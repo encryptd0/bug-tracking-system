@@ -7,31 +7,36 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="topbar shell">
     <div class="topbar-copy">
+      <p class="eyebrow">Workspace Settings</p>
       <h1>Manage Projects &amp; People</h1>
       <p>Create projects and people from this dedicated page.</p>
     </div>
-    <nav>
+    <nav class="tab-nav">
       <a class="tab-link" href="index.html">Back to Dashboard &amp; Issues</a>
     </nav>
   </header>
 
-  <main>
+  <main class="shell">
     <section class="panel active split">
-      <div>
+      <div class="subpanel">
         <h2>Create Project</h2>
+        <p class="subtle">Start with your core streams of work.</p>
         <form id="projectForm" class="form-grid">
           <label>Project Name <input name="name" required /></label>
           <button type="submit">Add Project</button>
         </form>
 
-        <h2 style="margin-top:1rem;">Projects</h2>
+        <h2 class="mt-lg">Projects</h2>
         <ul id="projectList" class="list plain"></ul>
       </div>
 
-      <div>
+      <div class="subpanel">
         <h2>Create Person</h2>
+        <p class="subtle">Build your team roster and assign ownership clearly.</p>
         <form id="personForm" class="form-grid">
           <label>Name <input name="name" required /></label>
           <label>Surname <input name="surname" required /></label>
@@ -44,7 +49,7 @@
           <button type="submit">Add Person</button>
         </form>
 
-        <h2 style="margin-top:1rem;">People &amp; Assignments</h2>
+        <h2 class="mt-lg">People &amp; Assignments</h2>
         <ul id="peopleList" class="list"></ul>
       </div>
     </section>

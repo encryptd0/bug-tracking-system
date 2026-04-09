@@ -7,33 +7,78 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="topbar shell">
     <div class="topbar-copy">
+      <p class="eyebrow">Focus Workspace</p>
       <h1 id="topbarTitle">Dashboard</h1>
       <p id="topbarDescription">A unique high-level summary of projects, people, and issue health.</p>
     </div>
-    <nav>
+    <nav class="tab-nav" aria-label="Primary">
       <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
       <button class="tab-btn" data-tab="issues">Issues</button>
       <a class="tab-link" href="manage.html">Manage Projects &amp; People</a>
     </nav>
   </header>
 
-  <main>
+  <main class="shell stack-lg">
     <section id="dashboard" class="tab panel active">
-      <h2>Workspace Overview</h2>
+      <div class="section-head">
+        <h2>Workspace Overview</h2>
+        <p>Understand team load and issue flow at a glance.</p>
+      </div>
       <div id="dashboardOverview" class="dashboard-grid"></div>
-      <h2>Issue Status Health</h2>
+
+      <div class="section-head">
+        <h2>Issue Status Health</h2>
+        <p>Monitor pressure signals before they become bottlenecks.</p>
+      </div>
       <div id="dashboardStatusHealth" class="dashboard-grid"></div>
-      <h2>Distribution Snapshot</h2>
+
+      <div class="section-head">
+        <h2>Distribution Snapshot</h2>
+        <p>See where ownership and attention are concentrated.</p>
+      </div>
       <div id="dashboardDistribution" class="dashboard-grid"></div>
     </section>
 
     <section id="issues" class="tab panel">
-      <div class="row-between">
-        <h2>Issues</h2>
+      <div class="row-between wrap">
+        <div>
+          <h2>Issues</h2>
+          <p class="subtle">Find, update, and resolve issues without leaving context.</p>
+        </div>
         <button id="createIssueBtn" type="button">Create New Issue</button>
       </div>
+
+      <div class="toolbar" aria-label="Issue filters">
+        <label>
+          Search
+          <input id="issueSearchInput" type="search" placeholder="Search summary, project, reporter..." />
+        </label>
+        <label>
+          Status
+          <select id="issueStatusFilter">
+            <option value="all">All statuses</option>
+            <option value="open">Open</option>
+            <option value="resolved">Resolved</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </label>
+        <label>
+          Priority
+          <select id="issuePriorityFilter">
+            <option value="all">All priorities</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </label>
+      </div>
+
+      <p id="issuesSummary" class="subtle" aria-live="polite"></p>
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -44,12 +89,13 @@
           <tbody id="issuesTableBody"></tbody>
         </table>
       </div>
-      <div class="split" style="margin-top:1rem;">
-        <div>
+
+      <div class="split mt-lg">
+        <div class="subpanel">
           <h3 id="issueFormTitle">Create Issue</h3>
           <form id="issueForm" class="form-grid"></form>
         </div>
-        <div>
+        <div class="subpanel">
           <div class="row-between">
             <h3>Issue Detail</h3>
             <button id="detailEditBtn" type="button">Edit Issue</button>
