@@ -359,7 +359,7 @@ function renderIssueTable() {
   if (!filteredIssues.length) {
     body.innerHTML = `
       <tr>
-        <td colspan="9">No issues matched your current filters. Try broadening your search.</td>
+        <td colspan="9" data-label="Message">No issues matched your current filters. Try broadening your search.</td>
       </tr>
     `;
     return;
@@ -372,15 +372,15 @@ function renderIssueTable() {
 
     return `
       <tr>
-        <td>#${issue.id}</td>
-        <td>${escapeHtml(issue.summary)}</td>
-        <td>${escapeHtml(reporter)}</td>
-        <td>${escapeHtml(project)}</td>
-        <td>${escapeHtml(assignee)}</td>
-        <td><span class="badge status-${escapeHtml(issue.status)}">${escapeHtml(issue.status)}</span></td>
-        <td><span class="badge priority-${escapeHtml(issue.priority)}">${escapeHtml(issue.priority)}</span></td>
-        <td>${escapeHtml(issue.identifiedDate)}</td>
-        <td>
+        <td data-label="ID">#${issue.id}</td>
+        <td data-label="Summary">${escapeHtml(issue.summary)}</td>
+        <td data-label="Reported By">${escapeHtml(reporter)}</td>
+        <td data-label="Project">${escapeHtml(project)}</td>
+        <td data-label="Assignee">${escapeHtml(assignee)}</td>
+        <td data-label="Status"><span class="badge status-${escapeHtml(issue.status)}">${escapeHtml(issue.status)}</span></td>
+        <td data-label="Priority"><span class="badge priority-${escapeHtml(issue.priority)}">${escapeHtml(issue.priority)}</span></td>
+        <td data-label="Identified">${escapeHtml(issue.identifiedDate)}</td>
+        <td data-label="Actions">
           <div class="table-actions">
             <button onclick="viewIssue(${issue.id})">View</button>
           </div>
