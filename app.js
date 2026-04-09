@@ -2,39 +2,26 @@ const STORAGE_KEY = "kanban_bug_tracker_data_v1";
 const STATUSES = ["open", "resolved", "overdue"];
 const PRIORITIES = ["low", "medium", "high"];
 const TAB_COPY = {
-  board: {
-    title: "Board Dashboard",
-    description: "Team-wide bug health, assignee workload, and issue flow.",
+  dashboard: {
+    title: "Dashboard",
+    description: "All bug details including reporter, assignee, priority, and status.",
+  },
+  project: {
+    title: "Project",
+    description: "View project status, existing projects, and issue volume by project.",
   },
   issues: {
-    title: "All Issues",
-    description: "Complete issue register with status, ownership, and priority.",
-  },
-  "create-issue": {
-    title: "Create Issue",
-    description: "Capture a new bug with all required project and resolution details.",
-  },
-  "issue-detail": {
-    title: "Issue Detail",
-    description: "Review a single issue record, timeline, and resolution information.",
+    title: "Issues",
+    description: "View and analyze bugs, ownership, and lifecycle status.",
   },
   people: {
     title: "People",
-    description: "Manage users and view the current people directory.",
-  },
-  projects: {
-    title: "Projects",
-    description: "Create and manage projects used to organize issues.",
-  },
-  report: {
-    title: "Issues by Project",
-    description: "Project-level issue counts for quick portfolio reporting.",
+    description: "Create accounts and view people grouped by their corresponding projects.",
   },
 };
 
 const appState = loadState();
 let currentIssueId = null;
-let editingIssueId = null;
 
 init();
 
@@ -42,21 +29,28 @@ function init() {
   bindTabs();
   bindPeopleForm();
   bindProjectForm();
-  renderIssueForm();
   renderAll();
-  updateTopbar("board");
+  updateTopbar("dashboard");
 }
 
 function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (raw) return JSON.parse(raw);
+  if (raw) {
+    const parsed = JSON.parse(raw);
+    if (!parsed.nextIds) parsed.nextIds = { issue: 1, person: 1, project: 1 };
+    parsed.people = (parsed.people || []).map(person => ({
+      ...person,
+      projectId: person.projectId || null,
+    }));
+    return parsed;
+  }
 
   const seed = {
     nextIds: { issue: 1, person: 4, project: 4 },
     people: [
-      { id: 1, name: "Maya", surname: "Stone", email: "maya.stone@example.com", username: "mstone", profilePictureUrl: "https://i.pravatar.cc/80?img=11" },
-      { id: 2, name: "Liam", surname: "Nguyen", email: "liam.nguyen@example.com", username: "lnguyen", profilePictureUrl: "https://i.pravatar.cc/80?img=12" },
-      { id: 3, name: "Ava", surname: "Patel", email: "ava.patel@example.com", username: "apatel", profilePictureUrl: "https://i.pravatar.cc/80?img=13" },
+      { id: 1, name: "Maya", surname: "Stone", email: "maya.stone@example.com", username: "mstone", projectId: 1, profilePictureUrl: "https://i.pravatar.cc/80?img=11" },
+      { id: 2, name: "Liam", surname: "Nguyen", email: "liam.nguyen@example.com", username: "lnguyen", projectId: 2, profilePictureUrl: "https://i.pravatar.cc/80?img=12" },
+      { id: 3, name: "Ava", surname: "Patel", email: "ava.patel@example.com", username: "apatel", projectId: 3, profilePictureUrl: "https://i.pravatar.cc/80?img=13" },
     ],
     projects: [
       { id: 1, name: "Web Platform" },
@@ -103,6 +97,7 @@ function bindPeopleForm() {
       surname: form.get("surname").trim(),
       email: form.get("email").trim(),
       username,
+      projectId: Number(form.get("projectId")),
       profilePictureUrl: form.get("profilePictureUrl").trim(),
     });
 
@@ -126,96 +121,31 @@ function bindProjectForm() {
   });
 }
 
-function renderIssueForm(issue = null) {
-  const issueForm = document.getElementById("issueForm");
-  const identifiedByOptions = appState.people
-    .map(p => `<option value="${p.id}" ${issue?.identifiedById === p.id ? "selected" : ""}>${fullName(p)}</option>`)
-    .join("");
-
-  const assigneeOptions = [`<option value="">Unassigned</option>`]
-    .concat(appState.people.map(p => `<option value="${p.id}" ${issue?.assigneeId === p.id ? "selected" : ""}>${fullName(p)}</option>`))
-    .join("");
-
-  const projectOptions = appState.projects
-    .map(project => `<option value="${project.id}" ${issue?.projectId === project.id ? "selected" : ""}>${project.name}</option>`)
-    .join("");
-
-  const statusOptions = STATUSES
-    .map(status => `<option value="${status}" ${issue ? (issue.status === status ? "selected" : "") : (status === "open" ? "selected" : "")}>${capitalize(status)}</option>`)
-    .join("");
-
-  const priorityOptions = PRIORITIES
-    .map(priority => `<option value="${priority}" ${issue ? (issue.priority === priority ? "selected" : "") : (priority === "medium" ? "selected" : "")}>${capitalize(priority)}</option>`)
-    .join("");
-
-  document.getElementById("issueFormTitle").textContent = issue ? `Edit Issue #${issue.id}` : "Create Issue";
-
-  issueForm.innerHTML = `
-    <label>Summary <input name="summary" required value="${escapeHtml(issue?.summary || "")}" /></label>
-    <label>Detailed Description <textarea name="description" required>${escapeHtml(issue?.description || "")}</textarea></label>
-    <label>Identified By <select name="identifiedById" required>${identifiedByOptions}</select></label>
-    <label>Identified Date <input type="date" name="identifiedDate" required value="${issue?.identifiedDate || today()}" /></label>
-    <label>Project <select name="projectId" required>${projectOptions}</select></label>
-    <label>Assigned To <select name="assigneeId">${assigneeOptions}</select></label>
-    <label>Status <select name="status" required>${statusOptions}</select></label>
-    <label>Priority <select name="priority" required>${priorityOptions}</select></label>
-    <label>Target Resolution Date <input type="date" name="targetResolutionDate" value="${issue?.targetResolutionDate || ""}" /></label>
-    <label>Actual Resolution Date <input type="date" name="actualResolutionDate" value="${issue?.actualResolutionDate || ""}" /></label>
-    <label>Resolution Summary <textarea name="resolutionSummary">${escapeHtml(issue?.resolutionSummary || "")}</textarea></label>
-    <button type="submit">Save Issue</button>
-  `;
-
-  issueForm.onsubmit = event => {
-    event.preventDefault();
-    const payload = Object.fromEntries(new FormData(issueForm).entries());
-
-    const issueData = {
-      summary: payload.summary.trim(),
-      description: payload.description.trim(),
-      identifiedById: Number(payload.identifiedById),
-      identifiedDate: payload.identifiedDate,
-      projectId: Number(payload.projectId),
-      assigneeId: payload.assigneeId ? Number(payload.assigneeId) : null,
-      status: payload.status,
-      priority: payload.priority,
-      targetResolutionDate: payload.targetResolutionDate || "",
-      actualResolutionDate: payload.actualResolutionDate || "",
-      resolutionSummary: payload.resolutionSummary.trim(),
-    };
-
-    if (!issueData.summary) {
-      alert("Summary is required.");
-      return;
-    }
-
-    if (editingIssueId) {
-      const index = appState.issues.findIndex(it => it.id === editingIssueId);
-      appState.issues[index] = { ...appState.issues[index], ...issueData };
-      editingIssueId = null;
-    } else {
-      appState.issues.push({ id: appState.nextIds.issue++, ...issueData });
-    }
-
-    issueForm.reset();
-    saveState();
-    renderAll();
-    switchTab("issues");
-  };
-}
-
 function renderAll() {
+  renderPeopleProjectOptions();
   renderBoardSummary();
   renderBoard();
+  renderDashboardIssueOverview();
+  renderIssueAnalytics();
   renderIssueTable();
   renderPeople();
   renderProjects();
   renderProjectReport();
+  renderIssueDetail(appState.issues.find(issue => issue.id === currentIssueId) || {
+    id: "-",
+    summary: "No issue selected",
+    description: "Select any issue from the dashboard board or issues table to inspect its details.",
+    identifiedById: null,
+    identifiedDate: "-",
+    projectId: null,
+    assigneeId: null,
+    status: "-",
+    priority: "-",
+    targetResolutionDate: "-",
+    actualResolutionDate: "-",
+    resolutionSummary: "-",
+  });
 
-  if (editingIssueId) {
-    renderIssueForm(appState.issues.find(issue => issue.id === editingIssueId));
-  } else {
-    renderIssueForm();
-  }
 }
 
 function updateTopbar(tabId) {
@@ -280,7 +210,6 @@ function renderBoard() {
               <small>Assigned: ${escapeHtml(assignee)}</small>
               <div class="table-actions" style="margin-top: .5rem;">
                 <button onclick="viewIssue(${issue.id})">View</button>
-                <button onclick="startEditIssue(${issue.id})">Edit</button>
               </div>
             </article>
           `;
@@ -300,6 +229,7 @@ function renderBoard() {
 function renderIssueTable() {
   const body = document.getElementById("issuesTableBody");
   body.innerHTML = appState.issues.map(issue => {
+    const reporter = fullName(getPerson(issue.identifiedById));
     const project = getProject(issue.projectId)?.name || "-";
     const assignee = getPerson(issue.assigneeId) ? fullName(getPerson(issue.assigneeId)) : "Unassigned";
 
@@ -307,6 +237,7 @@ function renderIssueTable() {
       <tr>
         <td>#${issue.id}</td>
         <td>${escapeHtml(issue.summary)}</td>
+        <td>${escapeHtml(reporter)}</td>
         <td>${escapeHtml(project)}</td>
         <td>${escapeHtml(assignee)}</td>
         <td>${escapeHtml(issue.status)}</td>
@@ -315,7 +246,6 @@ function renderIssueTable() {
         <td>
           <div class="table-actions">
             <button onclick="viewIssue(${issue.id})">View</button>
-            <button onclick="startEditIssue(${issue.id})">Edit</button>
           </div>
         </td>
       </tr>
@@ -323,8 +253,45 @@ function renderIssueTable() {
   }).join("");
 }
 
+function renderDashboardIssueOverview() {
+  const body = document.getElementById("dashboardIssueBody");
+  body.innerHTML = appState.issues.map(issue => {
+    const reporter = fullName(getPerson(issue.identifiedById));
+    const assignee = getPerson(issue.assigneeId) ? fullName(getPerson(issue.assigneeId)) : "Unassigned";
+    const project = getProject(issue.projectId)?.name || "-";
+    return `
+      <tr>
+        <td>#${issue.id}</td>
+        <td>${escapeHtml(issue.summary)}</td>
+        <td>${escapeHtml(reporter)}</td>
+        <td>${escapeHtml(assignee)}</td>
+        <td>${escapeHtml(project)}</td>
+        <td>${escapeHtml(issue.status)}</td>
+        <td>${escapeHtml(issue.priority)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderIssueAnalytics() {
+  document.getElementById("issueAnalytics").innerHTML = `
+    <article class="dashboard-card">
+      <h3>Status Breakdown</h3>
+      <p>Open: <strong>${appState.issues.filter(issue => issue.status === "open").length}</strong></p>
+      <p>Resolved: <strong>${appState.issues.filter(issue => issue.status === "resolved").length}</strong></p>
+      <p>Overdue: <strong>${appState.issues.filter(issue => issue.status === "overdue").length}</strong></p>
+    </article>
+    <article class="dashboard-card">
+      <h3>Priority Breakdown</h3>
+      <p>High: <strong>${appState.issues.filter(issue => issue.priority === "high").length}</strong></p>
+      <p>Medium: <strong>${appState.issues.filter(issue => issue.priority === "medium").length}</strong></p>
+      <p>Low: <strong>${appState.issues.filter(issue => issue.priority === "low").length}</strong></p>
+    </article>
+  `;
+}
+
 function renderIssueDetail(issue) {
-  const identifiedBy = fullName(getPerson(issue.identifiedById));
+  const identifiedBy = fullName(getPerson(issue.identifiedById)) || "-";
   const assignee = getPerson(issue.assigneeId) ? fullName(getPerson(issue.assigneeId)) : "Unassigned";
   const project = getProject(issue.projectId)?.name || "-";
 
@@ -343,9 +310,6 @@ function renderIssueDetail(issue) {
     <dt>Actual resolution date</dt><dd>${escapeHtml(issue.actualResolutionDate || "-")}</dd>
     <dt>Resolution summary</dt><dd>${escapeHtml(issue.resolutionSummary || "-")}</dd>
   `;
-
-  const editBtn = document.getElementById("detailEditBtn");
-  editBtn.onclick = () => startEditIssue(issue.id);
 }
 
 function renderPeople() {
@@ -356,6 +320,7 @@ function renderPeople() {
       <div>
         <strong>${escapeHtml(fullName(person))}</strong>
         <p>${escapeHtml(person.email)} · @${escapeHtml(person.username)}</p>
+        <small>Project: ${escapeHtml(getProject(person.projectId)?.name || "Unassigned")}</small>
       </div>
     </li>
   `).join("");
@@ -363,7 +328,10 @@ function renderPeople() {
 
 function renderProjects() {
   document.getElementById("projectList").innerHTML = appState.projects
-    .map(project => `<li>${project.id} - ${escapeHtml(project.name)}</li>`)
+    .map(project => {
+      const total = appState.issues.filter(issue => issue.projectId === project.id).length;
+      return `<li>${project.id} - ${escapeHtml(project.name)} <small>(${total} issue(s))</small></li>`;
+    })
     .join("");
 }
 
@@ -372,11 +340,14 @@ function renderProjectReport() {
     .map(project => ({
       name: project.name,
       count: appState.issues.filter(issue => issue.projectId === project.id).length,
+      open: appState.issues.filter(issue => issue.projectId === project.id && issue.status === "open").length,
+      resolved: appState.issues.filter(issue => issue.projectId === project.id && issue.status === "resolved").length,
+      overdue: appState.issues.filter(issue => issue.projectId === project.id && issue.status === "overdue").length,
     }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 
   document.getElementById("projectReportBody").innerHTML = rows
-    .map(row => `<tr><td>${escapeHtml(row.name)}</td><td>${row.count}</td></tr>`)
+    .map(row => `<tr><td>${escapeHtml(row.name)}</td><td>${row.count}</td><td>${row.open}</td><td>${row.resolved}</td><td>${row.overdue}</td></tr>`)
     .join("");
 }
 
@@ -385,15 +356,15 @@ function viewIssue(id) {
   if (!issue) return;
   currentIssueId = id;
   renderIssueDetail(issue);
-  switchTab("issue-detail");
+  switchTab("issues");
 }
 
-function startEditIssue(id) {
-  const issue = appState.issues.find(it => it.id === id);
-  if (!issue) return;
-  editingIssueId = id;
-  renderIssueForm(issue);
-  switchTab("create-issue");
+function renderPeopleProjectOptions() {
+  const select = document.getElementById("personProjectSelect");
+  if (!select) return;
+  select.innerHTML = appState.projects
+    .map(project => `<option value="${project.id}">${escapeHtml(project.name)}</option>`)
+    .join("");
 }
 
 function getPerson(id) {
@@ -419,10 +390,6 @@ function priorityRank(priority) {
   return 2;
 }
 
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -433,4 +400,3 @@ function escapeHtml(value) {
 }
 
 window.viewIssue = viewIssue;
-window.startEditIssue = startEditIssue;
