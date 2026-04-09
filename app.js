@@ -31,7 +31,7 @@ function init() {
   bindProjectForm();
   renderAll();
   bindIssueActions();
-  updateTopbar("dashboard");
+  switchTab("dashboard");
 }
 
 function loadState() {
@@ -77,13 +77,23 @@ function bindTabs() {
 
 function switchTab(tabId) {
   document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabId));
-  document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.id === tabId));
+  document.querySelectorAll(".tab").forEach(tab => {
+    const isActive = tab.id === tabId;
+    tab.classList.toggle("active", isActive);
+    tab.hidden = !isActive;
+  });
   updateTopbar(tabId);
 }
 
 function bindPeopleForm() {
   document.getElementById("personForm").addEventListener("submit", e => {
     e.preventDefault();
+
+    if (!isTabActive("people")) {
+      alert("People can only be created from the People tab.");
+      return;
+    }
+
     const form = new FormData(e.target);
     const username = form.get("username").trim();
 
@@ -111,6 +121,12 @@ function bindPeopleForm() {
 function bindProjectForm() {
   document.getElementById("projectForm").addEventListener("submit", e => {
     e.preventDefault();
+
+    if (!isTabActive("project")) {
+      alert("Projects can only be created from the Project tab.");
+      return;
+    }
+
     const form = new FormData(e.target);
     const name = form.get("name").trim();
     if (!name) return;
@@ -493,6 +509,10 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function isTabActive(tabId) {
+  return document.querySelector(`#${tabId}`)?.classList.contains("active");
 }
 
 window.viewIssue = viewIssue;
