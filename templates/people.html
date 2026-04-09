@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel split">
+  <div>
+    <h2>Create Person</h2>
+    <form method="post" class="form-grid">
+      <label>Name <input name="name" required /></label>
+      <label>Surname <input name="surname" required /></label>
+      <label>Email <input type="email" name="email" required /></label>
+      <label>Username <input name="username" required /></label>
+      <label>Profile Picture URL <input name="profile_picture_url" /></label>
+      <button type="submit">Add Person</button>
+    </form>
+  </div>
+  <div>
+    <h2>People</h2>
+    <ul class="list">
+      {% for person in people %}
+      <li>
+        <img src="{{ person.profile_picture_url or 'https://via.placeholder.com/40' }}" alt="{{ person.name }}" />
+        <div>
+          <strong>{{ person.name }} {{ person.surname }}</strong>
+          <p>{{ person.email }} · @{{ person.username }}</p>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel">
+  <h2>{{ 'Edit Issue' if issue else 'Create Issue' }}</h2>
+  <form method="post" class="form-grid">
+    <label>Summary <input name="summary" required value="{{ issue.summary if issue else '' }}" /></label>
+    <label>Detailed Description <textarea name="description" required>{{ issue.description if issue else '' }}</textarea></label>
+
+    <label>Identified By
+      <select name="identified_by" required>
+        {% for person in people %}
+        <option value="{{ person.id }}" {% if issue and issue.identified_by == person.id %}selected{% endif %}>{{ person.name }} {{ person.surname }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Identified Date
+      <input type="date" name="identified_date" required value="{{ issue.identified_date if issue else today }}" />
+    </label>
+
+    <label>Project
+      <select name="project_id" required>
+        {% for project in projects %}
+        <option value="{{ project.id }}" {% if issue and issue.project_id == project.id %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Assigned To
+      <select name="assignee_id">
+        <option value="">Unassigned</option>
+        {% for person in people %}
+        <option value="{{ person.id }}" {% if issue and issue.assignee_id == person.id %}selected{% endif %}>{{ person.name }} {{ person.surname }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Status
+      <select name="status" required>
+        {% for status in statuses %}
+        <option value="{{ status }}" {% if issue and issue.status == status %}selected{% elif not issue and status == 'open' %}selected{% endif %}>{{ status|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Priority
+      <select name="priority" required>
+        {% for priority in priorities %}
+        <option value="{{ priority }}" {% if issue and issue.priority == priority %}selected{% elif not issue and priority == 'medium' %}selected{% endif %}>{{ priority|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Target Resolution Date
+      <input type="date" name="target_resolution_date" value="{{ issue.target_resolution_date if issue and issue.target_resolution_date else '' }}" />
+    </label>
+
+    <label>Actual Resolution Date
+      <input type="date" name="actual_resolution_date" value="{{ issue.actual_resolution_date if issue and issue.actual_resolution_date else '' }}" />
+    </label>
+
+    <label>Resolution Summary
+      <textarea name="resolution_summary">{{ issue.resolution_summary if issue and issue.resolution_summary else '' }}</textarea>
+    </label>
+
+    <button type="submit">Save Issue</button>
+  </form>
+</section>
+{% endblock %}

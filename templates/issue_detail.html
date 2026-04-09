@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel">
+  <div class="row-between">
+    <h2>Issue #{{ issue.id }} - {{ issue.summary }}</h2>
+    <a class="button" href="{{ url_for('edit_issue', issue_id=issue.id) }}">Edit</a>
+  </div>
+  <dl class="details">
+    <dt>Description</dt><dd>{{ issue.description }}</dd>
+    <dt>Identified by</dt><dd>{{ issue.identified_by_name }}</dd>
+    <dt>Identified date</dt><dd>{{ issue.identified_date }}</dd>
+    <dt>Project</dt><dd>{{ issue.project_name }}</dd>
+    <dt>Assignee</dt><dd>{{ issue.assignee_name or 'Unassigned' }}</dd>
+    <dt>Status</dt><dd>{{ issue.status }}</dd>
+    <dt>Priority</dt><dd>{{ issue.priority }}</dd>
+    <dt>Target resolution date</dt><dd>{{ issue.target_resolution_date or '-' }}</dd>
+    <dt>Actual resolution date</dt><dd>{{ issue.actual_resolution_date or '-' }}</dd>
+    <dt>Resolution summary</dt><dd>{{ issue.resolution_summary or '-' }}</dd>
+  </dl>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel">
+  <h2>All Issues</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Summary</th><th>Project</th><th>Assignee</th><th>Status</th><th>Priority</th><th>Identified</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for issue in issues %}
+      <tr>
+        <td>#{{ issue.id }}</td>
+        <td><a href="{{ url_for('issue_detail', issue_id=issue.id) }}">{{ issue.summary }}</a></td>
+        <td>{{ issue.project_name }}</td>
+        <td>{{ issue.assignee_name or 'Unassigned' }}</td>
+        <td>{{ issue.status }}</td>
+        <td>{{ issue.priority }}</td>
+        <td>{{ issue.identified_date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}
