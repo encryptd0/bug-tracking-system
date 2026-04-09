@@ -119,7 +119,7 @@ body {
   backdrop-filter: blur(10px);
 }
 
-.panel.active { display: block;}
+.panel.active { display: grid;}
 
 .section-head {
   margin-bottom: 0.7rem;
@@ -151,7 +151,7 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 0.92rem;
-  margin: 0.9rem;
+  margin: 1rem;
 }
 
 .dashboard-card h3 { margin-bottom: 0.45rem; }
@@ -268,7 +268,7 @@ th {
 
 .split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1rem;
 }
 
