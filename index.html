@@ -10,11 +10,11 @@
   <header class="topbar">
     <div class="topbar-copy">
       <h1 id="topbarTitle">Dashboard</h1>
-      <p id="topbarDescription">All bug details including reporter, assignee, priority, and status.</p>
+      <p id="topbarDescription">A unique high-level summary of projects, people, and issue health.</p>
     </div>
     <nav>
       <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="tab-btn" data-tab="project">Project</button>
+      <button class="tab-btn" data-tab="project">Projects</button>
       <button class="tab-btn" data-tab="people">People</button>
       <button class="tab-btn" data-tab="issues">Issues</button>
     </nav>
@@ -22,20 +22,12 @@
 
   <main>
     <section id="dashboard" class="tab panel active">
-      <div id="boardSummary" class="dashboard-grid"></div>
-      <h2>Issue Board</h2>
-      <div class="board" id="boardColumns"></div>
-      <h2>Issue Ownership Overview</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th><th>Summary</th><th>Reported By</th><th>Assigned To</th><th>Project</th><th>Status</th><th>Priority</th>
-            </tr>
-          </thead>
-          <tbody id="dashboardIssueBody"></tbody>
-        </table>
-      </div>
+      <h2>Workspace Overview</h2>
+      <div id="dashboardOverview" class="dashboard-grid"></div>
+      <h2>Issue Status Health</h2>
+      <div id="dashboardStatusHealth" class="dashboard-grid"></div>
+      <h2>Distribution Snapshot</h2>
+      <div id="dashboardDistribution" class="dashboard-grid"></div>
     </section>
 
     <section id="issues" class="tab panel">
@@ -43,7 +35,6 @@
         <h2>Issues</h2>
         <button id="createIssueBtn" type="button">Create New Issue</button>
       </div>
-      <div id="issueAnalytics" class="dashboard-grid"></div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -85,7 +76,7 @@
         </form>
       </div>
       <div>
-        <h2>People</h2>
+        <h2>People & Assignments</h2>
         <ul id="peopleList" class="list"></ul>
       </div>
     </section>
@@ -99,15 +90,8 @@
         </form>
       </div>
       <div>
-        <h2>Projects & Status</h2>
+        <h2>Projects</h2>
         <ul id="projectList" class="list plain"></ul>
-        <h3>All Issues by Project</h3>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Project</th><th>Issue Count</th><th>Open</th><th>Resolved</th><th>Overdue</th></tr></thead>
-            <tbody id="projectReportBody"></tbody>
-          </table>
-        </div>
       </div>
     </section>
   </main>
