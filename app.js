@@ -84,6 +84,12 @@ function switchTab(tabId) {
 function bindPeopleForm() {
   document.getElementById("personForm").addEventListener("submit", e => {
     e.preventDefault();
+
+    if (!isTabActive("people")) {
+      alert("People can only be created from the People tab.");
+      return;
+    }
+
     const form = new FormData(e.target);
     const username = form.get("username").trim();
 
@@ -111,6 +117,12 @@ function bindPeopleForm() {
 function bindProjectForm() {
   document.getElementById("projectForm").addEventListener("submit", e => {
     e.preventDefault();
+
+    if (!isTabActive("project")) {
+      alert("Projects can only be created from the Project tab.");
+      return;
+    }
+
     const form = new FormData(e.target);
     const name = form.get("name").trim();
     if (!name) return;
@@ -493,6 +505,10 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function isTabActive(tabId) {
+  return document.querySelector(`#${tabId}`)?.classList.contains("active");
 }
 
 window.viewIssue = viewIssue;
