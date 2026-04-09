@@ -51,6 +51,7 @@ const issueFormTitle = document.getElementById("issueFormTitle");
 const saveIssueBtn = document.getElementById("saveIssueBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 const clearDataBtn = document.getElementById("clearDataBtn");
+const quickFilterButtons = Array.from(document.querySelectorAll(".chip-btn"));
 
 personForm.addEventListener("submit", onCreatePerson);
 projectForm.addEventListener("submit", onCreateProject);
@@ -62,6 +63,8 @@ issueSearch.addEventListener("input", renderIssues);
 sortBy.addEventListener("change", renderIssues);
 cancelEditBtn.addEventListener("click", resetIssueForm);
 clearDataBtn.addEventListener("click", resetAllData);
+quickFilterButtons.forEach((button) => button.addEventListener("click", onQuickFilter));
+document.addEventListener("keydown", onKeyboardShortcut);
 
 bootstrap();
 
@@ -188,6 +191,78 @@ function getFilteredAndSortedIssues() {
   return filtered;
 }
 
+function onQuickFilter(event) {
+  const mode = event.currentTarget.dataset.filter;
+
+  projectFilter.value = "";
+  issueSearch.value = "";
+  sortBy.value = "target-asc";
+
+  if (mode === "all") {
+    statusFilter.value = "";
+    priorityFilter.value = "";
+  }
+
+  if (mode === "overdue") {
+    statusFilter.value = "overdue";
+    priorityFilter.value = "";
+  }
+
+  if (mode === "high-priority") {
+    statusFilter.value = "";
+    priorityFilter.value = "high";
+    sortBy.value = "priority-desc";
+  }
+
+  if (mode === "my-open") {
+    statusFilter.value = "open";
+    priorityFilter.value = "";
+    issueSearch.value = "unassigned";
+  }
+
+  renderIssues();
+  setQuickFilterActiveState(mode);
+}
+
+function setQuickFilterActiveState(mode) {
+  quickFilterButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.filter === mode);
+  });
+}
+
+function syncQuickFiltersFromManualFilters() {
+  const isAll =
+    !statusFilter.value &&
+    !priorityFilter.value &&
+    !issueSearch.value.trim() &&
+    sortBy.value === "target-asc";
+
+  if (isAll) {
+    setQuickFilterActiveState("all");
+    return;
+  }
+
+  const isOverdue = statusFilter.value === "overdue" && !priorityFilter.value && !issueSearch.value.trim();
+  if (isOverdue) {
+    setQuickFilterActiveState("overdue");
+    return;
+  }
+
+  const isHighPriority = !statusFilter.value && priorityFilter.value === "high";
+  if (isHighPriority) {
+    setQuickFilterActiveState("high-priority");
+    return;
+  }
+
+  const isMyOpen = statusFilter.value === "open" && issueSearch.value.trim().toLowerCase() === "unassigned";
+  if (isMyOpen) {
+    setQuickFilterActiveState("my-open");
+    return;
+  }
+
+  quickFilterButtons.forEach((button) => button.classList.remove("is-active"));
+}
+
 function renderIssues() {
   issueTableBody.innerHTML = "";
 
@@ -223,6 +298,7 @@ function renderIssues() {
   });
 
   renderStats();
+  syncQuickFiltersFromManualFilters();
 }
 
 function renderStats() {
@@ -259,8 +335,8 @@ function viewIssue(issueId) {
     <div class="issue-detail-row"><strong>Identified Date:</strong> ${issue.identifiedDate}</div>
     <div class="issue-detail-row"><strong>Project:</strong> ${getProjectName(issue.projectId)}</div>
     <div class="issue-detail-row"><strong>Assigned To:</strong> ${issue.assignedTo ? getPersonLabel(issue.assignedTo) : "Unassigned"}</div>
-    <div class="issue-detail-row"><strong>Status:</strong> ${derivedStatus}</div>
-    <div class="issue-detail-row"><strong>Priority:</strong> ${issue.priority}</div>
+    <div class="issue-detail-row"><strong>Status:</strong> <span class="badge status-${derivedStatus}">${derivedStatus}</span></div>
+    <div class="issue-detail-row"><strong>Priority:</strong> <span class="badge priority-${issue.priority}">${issue.priority}</span></div>
     <div class="issue-detail-row"><strong>Target Resolution Date:</strong> ${issue.targetDate}</div>
     <div class="issue-detail-row"><strong>Actual Resolution Date:</strong> ${issue.actualDate || "N/A"}</div>
     <div class="issue-detail-row"><strong>Resolution Summary:</strong> ${issue.resolutionSummary || "N/A"}</div>
@@ -268,6 +344,15 @@ function viewIssue(issueId) {
 }
 
 window.viewIssue = viewIssue;
+
+function onKeyboardShortcut(event) {
+  const isSlash = event.key === "/";
+  const isTypingInInput = ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName);
+  if (!isSlash || isTypingInInput) return;
+
+  event.preventDefault();
+  issueSearch.focus();
+}
 
 function editIssue(issueId) {
   const issue = data.issues.find((x) => x.id === issueId);
