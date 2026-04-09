@@ -7,38 +7,52 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="aurora"></div>
   <div class="app-shell">
-    <header class="hero">
+    <header class="hero glass">
       <div>
         <p class="eyebrow">Issue Management Workspace</p>
         <h1>Bug Tracker</h1>
-        <p class="hero-subtitle">Track projects, teams, and issues with a cleaner, faster workflow.</p>
+        <p class="hero-subtitle">Track projects, teams, and issues with a calmer, focused workflow inspired by Apple-style product design.</p>
       </div>
-      <button type="button" id="clearDataBtn" class="ghost danger-outline">Reset Demo Data</button>
+      <div class="hero-actions">
+        <p class="kbd-hint">Press <kbd>/</kbd> to search</p>
+        <button type="button" id="clearDataBtn" class="ghost danger-outline">Reset Demo Data</button>
+      </div>
     </header>
 
     <main>
       <section class="stats-grid" id="statsGrid">
-        <article class="stat-card">
+        <article class="stat-card glass">
           <p>Total Issues</p>
           <h3 id="statTotal">0</h3>
         </article>
-        <article class="stat-card">
+        <article class="stat-card glass">
           <p>Open</p>
           <h3 id="statOpen">0</h3>
         </article>
-        <article class="stat-card">
+        <article class="stat-card glass">
           <p>Overdue</p>
           <h3 id="statOverdue">0</h3>
         </article>
-        <article class="stat-card">
+        <article class="stat-card glass">
           <p>Resolved</p>
           <h3 id="statResolved">0</h3>
         </article>
       </section>
 
+      <section class="quick-filters glass" aria-label="Quick filters">
+        <p class="quick-title">Focus</p>
+        <div class="quick-filter-buttons">
+          <button type="button" class="chip-btn is-active" data-filter="all">All Issues</button>
+          <button type="button" class="chip-btn" data-filter="overdue">Needs Attention</button>
+          <button type="button" class="chip-btn" data-filter="high-priority">High Priority</button>
+          <button type="button" class="chip-btn" data-filter="my-open">Unassigned Open</button>
+        </div>
+      </section>
+
       <section class="panel two-col">
-        <article class="card">
+        <article class="card glass">
           <h2>Create Person</h2>
           <form id="personForm" class="grid-form compact-form">
             <label>ID <input type="text" id="personId" required /></label>
@@ -52,7 +66,7 @@
           <ul id="peopleList" class="chip-list"></ul>
         </article>
 
-        <article class="card">
+        <article class="card glass">
           <h2>Create Project</h2>
           <form id="projectForm" class="grid-form compact-form">
             <label>ID <input type="text" id="projectId" required /></label>
@@ -64,7 +78,7 @@
       </section>
 
       <section class="panel two-col">
-        <article class="card">
+        <article class="card glass">
           <h2 id="issueFormTitle">Create Issue</h2>
           <form id="issueForm" class="grid-form">
             <input type="hidden" id="issueId" />
@@ -98,13 +112,13 @@
           </form>
         </article>
 
-        <article class="card sticky">
+        <article class="card sticky glass">
           <h2>Issue Details</h2>
           <div id="issueDetails" class="details-empty">Select an issue to view full details.</div>
         </article>
       </section>
 
-      <section class="card">
+      <section class="card glass">
         <div class="toolbar toolbar-filters">
           <h2>All Issues</h2>
           <div class="toolbar-controls">
