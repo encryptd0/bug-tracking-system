@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanban Bug Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Kanban Bug Tracker</h1>
+      <p>Modern issue tracking built with HTML, CSS, and JavaScript.</p>
+    </div>
+    <nav>
+      <button class="tab-btn active" data-tab="board">Board</button>
+      <button class="tab-btn" data-tab="issues">All Issues</button>
+      <button class="tab-btn" data-tab="create-issue">Create Issue</button>
+      <button class="tab-btn" data-tab="people">People</button>
+      <button class="tab-btn" data-tab="projects">Projects</button>
+      <button class="tab-btn" data-tab="report">By Project</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="board" class="tab panel active">
+      <div class="board" id="boardColumns"></div>
+    </section>
+
+    <section id="issues" class="tab panel">
+      <h2>All Issues</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Summary</th><th>Project</th><th>Assignee</th><th>Status</th><th>Priority</th><th>Identified</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="issuesTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="create-issue" class="tab panel">
+      <h2 id="issueFormTitle">Create Issue</h2>
+      <form id="issueForm" class="form-grid"></form>
+    </section>
+
+    <section id="issue-detail" class="tab panel">
+      <div class="row-between">
+        <h2>Issue Detail</h2>
+        <button id="detailEditBtn">Edit Issue</button>
+      </div>
+      <dl id="issueDetail" class="details"></dl>
+    </section>
+
+    <section id="people" class="tab panel split">
+      <div>
+        <h2>Create Person</h2>
+        <form id="personForm" class="form-grid">
+          <label>Name <input name="name" required /></label>
+          <label>Surname <input name="surname" required /></label>
+          <label>Email <input type="email" name="email" required /></label>
+          <label>Username <input name="username" required /></label>
+          <label>Profile Picture URL <input name="profilePictureUrl" /></label>
+          <button type="submit">Add Person</button>
+        </form>
+      </div>
+      <div>
+        <h2>People</h2>
+        <ul id="peopleList" class="list"></ul>
+      </div>
+    </section>
+
+    <section id="projects" class="tab panel split">
+      <div>
+        <h2>Create Project</h2>
+        <form id="projectForm" class="form-grid">
+          <label>Project Name <input name="name" required /></label>
+          <button type="submit">Add Project</button>
+        </form>
+      </div>
+      <div>
+        <h2>Projects</h2>
+        <ul id="projectList" class="list plain"></ul>
+      </div>
+    </section>
+
+    <section id="report" class="tab panel">
+      <h2>All Issues by Project</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Project</th><th>Issue Count</th></tr></thead>
+          <tbody id="projectReportBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
