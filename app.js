@@ -332,11 +332,11 @@ function renderDashboardDistribution() {
   document.getElementById("dashboardDistribution").innerHTML = `
     <article class="dashboard-card">
       <h3>Busiest Project</h3>
-      <p>${busiestProject ? `${escapeHtml(busiestProject.name)} (${busiestProject.count} issue(s))` : "No projects"}</p>
+      <p>${busiestProject ? `${escapeHtml(busiestProject.name)} ${busiestProject.count} issue(s)` : "No projects"}</p>
     </article>
     <article class="dashboard-card">
       <h3>Busiest Assignee</h3>
-      <p>${busiestPerson ? `${escapeHtml(busiestPerson.name)} (${busiestPerson.count} issue(s))` : "No people"}</p>
+      <p>${busiestPerson ? `${escapeHtml(busiestPerson.name)} ${busiestPerson.count} issue(s)` : "No people"}</p>
     </article>
     <article class="dashboard-card">
       <h3>Project Coverage</h3>
