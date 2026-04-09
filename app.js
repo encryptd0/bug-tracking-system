@@ -6,17 +6,9 @@ const TAB_COPY = {
     title: "Dashboard",
     description: "A unique high-level summary of projects, people, and issue health.",
   },
-  project: {
-    title: "Projects",
-    description: "Create and manage projects only.",
-  },
   issues: {
     title: "Issues",
     description: "Create, view, and edit issue details only.",
-  },
-  people: {
-    title: "People",
-    description: "Create people and assign them to projects only.",
   },
 };
 
@@ -28,8 +20,6 @@ init();
 
 function init() {
   bindTabs();
-  bindPeopleForm();
-  bindProjectForm();
   bindIssueActions();
   renderAll();
   switchTab("dashboard");
@@ -159,6 +149,13 @@ function bindIssueActions() {
 
 function renderIssueForm(issue = null) {
   const issueForm = document.getElementById("issueForm");
+
+  if (!appState.people.length || !appState.projects.length) {
+    document.getElementById("issueFormTitle").textContent = "Create Issue";
+    issueForm.innerHTML = `<p>Add at least one project and one person on the Manage Projects & People page before creating issues.</p>`;
+    issueForm.onsubmit = null;
+    return;
+  }
   const identifiedByOptions = appState.people
     .map(p => `<option value="${p.id}" ${issue?.identifiedById === p.id ? "selected" : ""}>${fullName(p)}</option>`)
     .join("");
@@ -240,8 +237,6 @@ function renderAll() {
   renderDashboardStatusHealth();
   renderDashboardDistribution();
   renderIssueTable();
-  renderPeople();
-  renderProjects();
   renderIssueDetail(appState.issues.find(issue => issue.id === currentIssueId) || {
     id: "-",
     summary: "No issue selected",

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Projects & People</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-copy">
+      <h1>Manage Projects &amp; People</h1>
+      <p>Create projects and people from this dedicated page.</p>
+    </div>
+    <nav>
+      <a class="tab-link" href="index.html">Back to Dashboard &amp; Issues</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="panel active split">
+      <div>
+        <h2>Create Project</h2>
+        <form id="projectForm" class="form-grid">
+          <label>Project Name <input name="name" required /></label>
+          <button type="submit">Add Project</button>
+        </form>
+
+        <h2 style="margin-top:1rem;">Projects</h2>
+        <ul id="projectList" class="list plain"></ul>
+      </div>
+
+      <div>
+        <h2>Create Person</h2>
+        <form id="personForm" class="form-grid">
+          <label>Name <input name="name" required /></label>
+          <label>Surname <input name="surname" required /></label>
+          <label>Email <input type="email" name="email" required /></label>
+          <label>Username <input name="username" required /></label>
+          <label>Project
+            <select name="projectId" id="personProjectSelect" required></select>
+          </label>
+          <label>Profile Picture URL <input name="profilePictureUrl" /></label>
+          <button type="submit">Add Person</button>
+        </form>
+
+        <h2 style="margin-top:1rem;">People &amp; Assignments</h2>
+        <ul id="peopleList" class="list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script src="manage.js"></script>
+</body>
+</html>
