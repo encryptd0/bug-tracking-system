@@ -21,6 +21,7 @@ init();
 function init() {
   bindTabs();
   bindIssueActions();
+  bindIssueFilters();
   renderAll();
   switchTab("dashboard");
 }
@@ -144,6 +145,18 @@ function bindIssueActions() {
       return;
     }
     startEditIssue(currentIssueId);
+  });
+}
+
+function bindIssueFilters() {
+  const searchInput = document.getElementById("issueSearchInput");
+  const statusFilter = document.getElementById("issueStatusFilter");
+  const priorityFilter = document.getElementById("issuePriorityFilter");
+
+  [searchInput, statusFilter, priorityFilter].forEach(control => {
+    if (!control) return;
+    control.addEventListener("input", renderIssueTable);
+    control.addEventListener("change", renderIssueTable);
   });
 }
 
@@ -334,7 +347,25 @@ function renderDashboardDistribution() {
 
 function renderIssueTable() {
   const body = document.getElementById("issuesTableBody");
-  body.innerHTML = appState.issues.map(issue => {
+  const filteredIssues = getFilteredIssues();
+  const summary = document.getElementById("issuesSummary");
+  if (summary) {
+    const total = appState.issues.length;
+    summary.textContent = total === filteredIssues.length
+      ? `Showing all ${total} issue(s).`
+      : `Showing ${filteredIssues.length} of ${total} issue(s) based on your filters.`;
+  }
+
+  if (!filteredIssues.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="9">No issues matched your current filters. Try broadening your search.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  body.innerHTML = filteredIssues.map(issue => {
     const reporter = fullName(getPerson(issue.identifiedById));
     const project = getProject(issue.projectId)?.name || "-";
     const assignee = getPerson(issue.assigneeId) ? fullName(getPerson(issue.assigneeId)) : "Unassigned";
@@ -346,8 +377,8 @@ function renderIssueTable() {
         <td>${escapeHtml(reporter)}</td>
         <td>${escapeHtml(project)}</td>
         <td>${escapeHtml(assignee)}</td>
-        <td>${escapeHtml(issue.status)}</td>
-        <td>${escapeHtml(issue.priority)}</td>
+        <td><span class="badge status-${escapeHtml(issue.status)}">${escapeHtml(issue.status)}</span></td>
+        <td><span class="badge priority-${escapeHtml(issue.priority)}">${escapeHtml(issue.priority)}</span></td>
         <td>${escapeHtml(issue.identifiedDate)}</td>
         <td>
           <div class="table-actions">
@@ -357,6 +388,39 @@ function renderIssueTable() {
       </tr>
     `;
   }).join("");
+}
+
+function getFilteredIssues() {
+  const searchInput = document.getElementById("issueSearchInput");
+  const statusFilter = document.getElementById("issueStatusFilter");
+  const priorityFilter = document.getElementById("issuePriorityFilter");
+  const query = (searchInput?.value || "").trim().toLowerCase();
+  const status = statusFilter?.value || "all";
+  const priority = priorityFilter?.value || "all";
+
+  return appState.issues.filter(issue => {
+    if (status !== "all" && issue.status !== status) return false;
+    if (priority !== "all" && issue.priority !== priority) return false;
+    if (!query) return true;
+
+    const reporter = fullName(getPerson(issue.identifiedById)).toLowerCase();
+    const assignee = fullName(getPerson(issue.assigneeId)).toLowerCase();
+    const project = (getProject(issue.projectId)?.name || "").toLowerCase();
+
+    return [
+      issue.summary,
+      issue.description,
+      issue.status,
+      issue.priority,
+      issue.identifiedDate,
+      reporter,
+      assignee,
+      project,
+    ]
+      .join(" ")
+      .toLowerCase()
+      .includes(query);
+  });
 }
 
 function renderIssueDetail(issue) {
