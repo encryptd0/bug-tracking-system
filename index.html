@@ -10,17 +10,25 @@
   <div class="bg-glow" aria-hidden="true"></div>
 
   <header class="topbar shell">
+  <div class="topbar-left">
     <div class="topbar-copy">
       <p class="eyebrow">Focus Workspace</p>
       <h1 id="topbarTitle">Dashboard</h1>
       <p id="topbarDescription">A unique high-level summary of projects, people, and issue health.</p>
     </div>
-    <nav class="tab-nav" aria-label="Primary">
-      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="tab-btn" data-tab="issues">Issues</button>
-      <a class="tab-link" href="manage.html">Manage Projects &amp; People</a>
-    </nav>
-  </header>
+    <div class="user-badge" id="userBadge" style="display: none;">
+      <span class="user-avatar">👤</span>
+      <span class="user-name" id="currentUsername"></span>
+    </div>
+  </div>
+  <nav class="tab-nav" aria-label="Primary">
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="issues">Issues</button>
+    <a class="tab-link" href="manage.html">Manage Projects &amp; People</a>
+    <button class="tab-btn logout-btn" id="logoutBtn"> Logout </button>
+  </nav>
+</header>
+   
 
   <main class="shell stack-lg">
     <section id="dashboard" class="tab panel active">
@@ -107,5 +115,30 @@
   </main>
 
   <script src="app.js"></script>
+
+  <script src="auth.js"></script>
+<script>
+  (function() {
+    if (!isAuthenticated()) {
+      localStorage.setItem('redirectAfterLogin', 'index.html');
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    const user = getCurrentUser();
+    if (user) {
+      const userBadge = document.getElementById('userBadge');
+      const usernameSpan = document.getElementById('currentUsername');
+      if (userBadge) userBadge.style.display = 'flex';
+      if (usernameSpan) usernameSpan.textContent = user.username;
+    }
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', logout);
+    }
+  })();
+</script>
+
 </body>
 </html>

@@ -19,6 +19,12 @@ let editingIssueId = null;
 init();
 
 function init() {
+  if (typeof isAuthenticated !== 'undefined' && !isAuthenticated()) {
+    localStorage.setItem('redirectAfterLogin', 'index.html');
+    window.location.href = 'login.html';
+    return;
+  }
+
   bindTabs();
   bindIssueActions();
   bindIssueFilters();

@@ -17,6 +17,7 @@
     </div>
     <nav class="tab-nav">
       <a class="tab-link" href="index.html">Back to Dashboard &amp; Issues</a>
+       <button class="tab-btn logout-btn" id="logoutBtn"> Logout </button>
     </nav>
   </header>
 
@@ -55,6 +56,24 @@
     </section>
   </main>
 
-  <script src="manage.js"></script>
+  
+  <script src="auth.js"></script>
+<script>
+  (function() {
+    if (!isAuthenticated()) {
+      localStorage.setItem('redirectAfterLogin', 'manage.html');
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', logout);
+    }
+  })();
+</script>
+
+<script src="manage.js"></script>
+
 </body>
 </html>
